@@ -1,0 +1,65 @@
+name: d_rocket_engine_postgres
+description: >
+  PostgreSQL engine for d_rocket 2.0. Implements the
+  d_rocket DbEngine contract over the Postgres wire
+  protocol (via package:postgres). Ships the
+  PostgresQueryProvider (AsyncQueryProvider), the
+  PgDb facade, the SQL LINQ Queryable<T> with
+  Postgres-dialect SQL translation, and a
+  dRocketPostgres() registration helper. Use
+  d_rocket_engine_postgres when you need a
+  multi-user / multi-machine backend; for local
+  single-user apps, prefer d_rocket_engine_sqlite.
+version: 2.0.0
+
+repository: https://github.com/torogoz-tech/d_rocket
+homepage: https://github.com/torogoz-tech/d_rocket
+issue_tracker: https://github.com/torogoz-tech/d_rocket/issues
+documentation: https://github.com/torogoz-tech/d_rocket#readme
+
+topics:
+  - postgres
+  - postgresql
+  - orm
+  - engine
+  - d_rocket
+  - engine-agnostic
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  d_rocket: ^2.0.0
+  meta: ^1.17.0
+  # The Postgres wire-protocol client. We use the
+  # `postgres` package (by stablekernel) for the
+  # wire-protocol implementation. This is a pure
+  # Dart client that speaks the Postgres v3 wire
+  # protocol directly over TCP; it does NOT use
+  # libpq via FFI. A future 2.1 release may add
+  # an FFI-backed variant for cases that need
+  # libpq's extra features (e.g. async LISTEN
+  # via PQconsumeInput). For 2.0 the wire-protocol
+  # client covers the 99% case and works on every
+  # platform Dart supports.
+  postgres: ^3.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  lints: ^6.0.0
+  test: ^1.30.0
+
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
+
+flutter:

@@ -1,0 +1,5 @@
+dependency_overrides:
+  d_rocket:
+    path: ../d_rocket
+  d_rocket_engine_sqlite:
+    path: ../d_rocket_engine_sqlite
