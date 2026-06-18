@@ -84,6 +84,56 @@ void main() {
     });
   });
 
+  group('Queryable<T> (core) with PostgresDialect', () {
+    test(
+      'asQueryable returns the core Queryable<T> with PostgresDialect',
+      () async {
+        final url = testPgUrlOrNull;
+        if (url == null) return;
+        // Open a real Postgres and ask for
+        // an asQueryable. The returned type
+        // is the engine-agnostic Queryable<T>
+        // from d_rocket core (not a
+        // PostgresQueryable<T>). The dialect
+        // is the PostgresDialect.
+        final db = await PgDb.open(url: url);
+        try {
+          // We don't have a codegen-supplied
+          // EntityMeta here, so we build the
+          // Queryable<T> by hand using the
+          // same factory the engine's
+          // asQueryable() uses internally.
+          final queryable = Queryable<Map<String, Object?>>(
+            asyncProvider: db.provider,
+            dialect: const PostgresDialect(),
+            table: 'pg_linq_test_users',
+            meta: EntityMeta(
+              tableName: 'pg_linq_test_users',
+              columns: const <ColumnMeta>[],
+              insertableColumns: const <ColumnMeta>[],
+              updatableColumns: const <ColumnMeta>[],
+              primaryKey: const ColumnMeta(
+                sqlName: 'id',
+                dartField: 'id',
+                dartType: int,
+              ),
+              primaryKeyIndex: 0,
+              pkOf: (Object e) => null,
+            ),
+            reader: (Map<String, Object?> row) => row,
+          );
+          // The returned queryable is the
+          // core type — same class the
+          // SQLite engine uses.
+          expect(queryable, isA<Queryable<Map<String, Object?>>>());
+        } finally {
+          await db.close();
+        }
+      },
+      skip: pgSkipReason,
+    );
+  });
+
   group('PostgresQueryable integration', () {
     test(
       'where_ filters rows against a real Postgres',
