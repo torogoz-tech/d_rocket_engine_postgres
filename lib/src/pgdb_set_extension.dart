@@ -1,47 +1,63 @@
 /// The `DbSet<T>.asQueryable` extension for
 /// the Postgres engine.
 ///
-/// Mirrors the SQLite engine's
-/// `SqliteDbSetExtension<T>`: returns a
-/// [PostgresQueryable] wired to the attached
-/// [PostgresQueryProvider] + the
-/// [PostgresDialect].
+/// In d_rocket 2.0.0, the Postgres engine
+/// uses the engine-agnostic [Queryable] from
+/// d_rocket core (the same class the SQLite
+/// engine uses). The only engine-specific
+/// bits are:
 ///
-/// Most users don't need this directly —
-/// the [DbSetLinqExtension] below exposes
-/// the LINQ surface on `DbSet<T>` itself.
-/// `asQueryable` is kept for advanced
-/// cases.
+/// 1. The [PostgresDialect] (overrides
+///    `STRPOS` for String.contains and
+///    `jsonb_build_object` for map literals).
+/// 2. The [PostgresQueryProvider] (the
+///    wire-protocol client; rewrites `?`
+///    placeholders to `$1, $2, ...` on the
+///    wire).
 ///
-/// Throws [UnsupportedError] when no
-/// [PostgresQueryProvider] is attached
-/// (i.e. when a `DbSet` is created
-/// outside of a `PgDb`).
+/// The Postgres engine is async-only (it
+/// does NOT implement [LegacySyncQueryProvider]
+/// like the SQLite engine does). Calling
+/// the legacy sync LINQ methods
+/// (`toList_`, `count_`, `first_`, …)
+/// throws a clear "this engine is async-only;
+/// use the *Async_ variant" error.
+///
+/// The result is that the Postgres engine
+/// gets the FULL LINQ surface for free:
+/// every operator that the SQLite engine
+/// has (where_, select_, orderBy_, take_,
+/// skip_, groupBy_, join_, selectMany_,
+/// union_, intersect_, except_, distinct_,
+/// thenBy_, firstOrDefault_, etc.) is
+/// available in the Postgres engine with
+/// zero additional code — the engine only
+/// contributed the [PostgresDialect] and the
+/// [PostgresQueryProvider].
 library;
 
 import 'package:d_rocket/d_rocket.dart';
 
 import 'pg/pg_dialect.dart';
 import 'pg/query_provider.dart';
-import 'pg/queryable.dart';
 
 /// helper: extracts a [PostgresQueryProvider]
-/// from a `DbSet<T>` (via either the sync
-/// or the async attachment slot). Returns
-/// null if no Postgres provider is attached.
+/// from a `DbSet<T>` (via the async
+/// attachment slot). Returns null if no
+/// Postgres provider is attached.
 PostgresQueryProvider? _pgProviderOf<T>(DbSet<T> set) {
-  final Object? fromAttach = set.get<PostgresQueryProvider>();
-  if (fromAttach is PostgresQueryProvider) return fromAttach;
   final AsyncQueryProvider? fromAsync = set.asyncProvider;
   if (fromAsync is PostgresQueryProvider) return fromAsync;
   return null;
 }
 
 /// (the bridge): a `DbSet<T>.asQueryable`
-/// extension. Returns a [PostgresQueryable]
-/// wired to the attached [PostgresQueryProvider].
+/// extension. Returns the engine-agnostic
+/// [Queryable] from d_rocket core, wired
+/// to the attached [PostgresQueryProvider]
+/// and the [PostgresDialect].
 extension PostgresDbSetExtension<T> on DbSet<T> {
-  PostgresQueryable<T> asQueryable() {
+  Queryable<T> asQueryable() {
     final PostgresQueryProvider? pg = _pgProviderOf(this);
     if (pg == null) {
       throw UnsupportedError(
@@ -59,7 +75,18 @@ extension PostgresDbSetExtension<T> on DbSet<T> {
         '`d_rocket_builder:table` codegen.',
       );
     }
-    return PostgresQueryable<T>(
+    // The engine-agnostic Queryable<T> from
+    // d_rocket core, with:
+    //   - asyncProvider: the Postgres engine
+    //     (so toListAsync_ / countAsync_ /
+    //     firstAsync_ work).
+    //   - dialect: the PostgresDialect (so
+    //     String.contains emits STRPOS, map
+    //     literals emit jsonb_build_object).
+    //   - provider: null (the Postgres engine
+    //     is async-only; the legacy sync
+    //     methods throw with a clear error).
+    return Queryable<T>(
       asyncProvider: pg,
       dialect: const PostgresDialect(),
       table: meta.tableName,
@@ -72,7 +99,8 @@ extension PostgresDbSetExtension<T> on DbSet<T> {
 
 /// (the LINQ surface): the LINQ operators
 /// exposed directly on `DbSet<T>`. Each
-/// one returns a [PostgresQueryable] (or a
+/// one returns the engine-agnostic
+/// [Queryable] from d_rocket core (or a
 /// typed variant for `select<T2>`), so the
 /// user chains them naturally:
 ///
@@ -84,32 +112,29 @@ extension PostgresDbSetExtension<T> on DbSet<T> {
 /// .toListAsync_();
 /// ```
 extension DbSetLinqExtension<T> on DbSet<T> {
-  /// `WHERE` clause. Mirrors
-  /// [PostgresQueryable.where_].
-  PostgresQueryable<T> where(Expr predicate) => asQueryable().where_(predicate);
+  /// `WHERE` clause. Mirrors [Queryable.where_].
+  Queryable<T> where(Expr predicate) => asQueryable().where_(predicate);
 
   /// `ORDER BY ... ASC`. Mirrors
-  /// [PostgresQueryable.orderBy_].
-  PostgresQueryable<T> orderBy(Expr keySelector) =>
+  /// [Queryable.orderBy_].
+  Queryable<T> orderBy(Expr keySelector) =>
       asQueryable().orderBy_(keySelector);
 
   /// `ORDER BY ... DESC`. Mirrors
-  /// [PostgresQueryable.orderByDescending_].
-  PostgresQueryable<T> orderByDescending(Expr keySelector) =>
+  /// [Queryable.orderByDescending_].
+  Queryable<T> orderByDescending(Expr keySelector) =>
       asQueryable().orderByDescending_(keySelector);
 
   /// `SELECT` projection. Mirrors
-  /// [PostgresQueryable.select_]. The
-  /// result type `T2` is inferred from
-  /// the selector.
-  PostgresQueryable<T2> select<T2>(Expr selector) =>
+  /// [Queryable.select_]. The result
+  /// type `T2` is inferred from the
+  /// selector.
+  Queryable<T2> select<T2>(Expr selector) =>
       asQueryable().select_<T2>(selector);
 
-  /// `LIMIT n`. Mirrors
-  /// [PostgresQueryable.take_].
-  PostgresQueryable<T> take(int n) => asQueryable().take_(n);
+  /// `LIMIT n`. Mirrors [Queryable.take_].
+  Queryable<T> take(int n) => asQueryable().take_(n);
 
-  /// `OFFSET n`. Mirrors
-  /// [PostgresQueryable.skip_].
-  PostgresQueryable<T> skip(int n) => asQueryable().skip_(n);
+  /// `OFFSET n`. Mirrors [Queryable.skip_].
+  Queryable<T> skip(int n) => asQueryable().skip_(n);
 }

@@ -90,7 +90,15 @@ export 'package:d_rocket/d_rocket.dart';
 
 export 'src/pg/pg_dialect.dart';
 export 'src/pg/query_provider.dart';
-export 'src/pg/queryable.dart';
+//: `src/pg/queryable.dart` is gone. The
+// Postgres engine uses the engine-agnostic
+// `Queryable<T>` from d_rocket core
+// (re-exported by the d_rocket barrel).
+// The engine only contributes the
+// `PostgresDialect` (3-method dialect
+// override) and the `PostgresQueryProvider`
+// (wire-protocol client + `?` to `$N`
+// rewrite).
 export 'src/pgdb.dart';
 export 'src/pgdb_set_extension.dart';
 export 'src/postgres_engine.dart';
