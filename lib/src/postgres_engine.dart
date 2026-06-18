@@ -36,11 +36,54 @@ library;
 
 import 'package:d_rocket/d_rocket.dart';
 
-import 'pg/query_provider.dart';
+import 'pg/pool.dart';
+import 'pg/pool_config.dart';
 
 /// The Postgres-backed [DbEngine] implementation.
+///
+/// ## Engine-specific config
+///
+/// The [pool] field holds the
+/// [PoolConfig] (the connection-pool
+/// tuning). The pool is engine-specific
+/// (Postgres needs one; SQLite does not),
+/// so it lives on the engine constructor,
+/// not on the facade (`PgDb.open`).
+///
+/// The pool is `const` so the engine can
+/// also be `const`. The pool itself is
+/// created lazily at `open()` time.
+///
+/// ## Usage
+///
+/// ```dart
+/// // Default pool (1 conn min, 10 conn max).
+/// final db = await PgDb.open(
+///   url: 'postgres://...',
+///   engine: const PostgresEngine(),
+/// );
+///
+/// // Tuned pool.
+/// final db = await PgDb.open(
+///   url: 'postgres://...',
+///   engine: const PostgresEngine(
+///     pool: PoolConfig(
+///       min: 4,
+///       max: 32,
+///       idleTimeout: Duration(minutes: 5),
+///     ),
+///   ),
+/// );
+/// ```
 class PostgresEngine implements DbEngine {
-  const PostgresEngine();
+  /// The pool configuration. Engine-specific.
+  /// See [PoolConfig] for the parameters.
+  ///
+  /// Default: `PoolConfig()` (1 conn min,
+  /// 10 conn max, 5 min idle timeout).
+  final PoolConfig pool;
+
+  const PostgresEngine({this.pool = const PoolConfig()});
 
   @override
   String get name => 'postgres';
@@ -78,15 +121,21 @@ class PostgresEngine implements DbEngine {
       throw DatabaseException(
         'The Postgres engine requires a connection string '
         'as the `path` parameter. Pass the full URL, e.g. '
-        "'postgres://user:pass@host:5432/dbname', or just "
+        "'postgres://app:secret@host:5432/dbname', or just "
         'the host/port/db. See the package README for the '
         'connection string format.',
       );
     }
-    final provider = await PostgresQueryProvider.openFromUrl(
+    // Open a pool of N connections (not a
+    // single connection). The pool implements
+    // AsyncQueryProvider so the rest of
+    // d_rocket (LINQ, DbContext, migrations)
+    // is unaware of the pool.
+    final PostgresPool pool = await PostgresPool.open(
       url: path,
       password: password,
+      config: this.pool,
     );
-    return provider;
+    return pool;
   }
 }

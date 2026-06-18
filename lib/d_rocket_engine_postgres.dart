@@ -89,6 +89,8 @@ import 'src/postgres_engine.dart';
 export 'package:d_rocket/d_rocket.dart';
 
 export 'src/pg/pg_dialect.dart';
+export 'src/pg/pool.dart';
+export 'src/pg/pool_config.dart';
 export 'src/pg/query_provider.dart';
 //: `src/pg/queryable.dart` is gone. The
 // Postgres engine uses the engine-agnostic
