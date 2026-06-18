@@ -88,8 +88,11 @@ import 'src/postgres_engine.dart';
 // REST, sync, realtime).
 export 'package:d_rocket/d_rocket.dart';
 
+export 'src/pg/pg_dialect.dart';
 export 'src/pg/query_provider.dart';
+export 'src/pg/queryable.dart';
 export 'src/pgdb.dart';
+export 'src/pgdb_set_extension.dart';
 export 'src/postgres_engine.dart';
 
 /// Top-level registration helper. Call once

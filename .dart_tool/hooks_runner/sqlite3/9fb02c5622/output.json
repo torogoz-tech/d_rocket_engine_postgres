@@ -2,7 +2,7 @@
   "assets": [
     {
       "encoding": {
-        "file": "/Users/abner/Projects/DWorkspace/packages/d_rocket_engine_postgres/.dart_tool/hooks_runner/shared/sqlite3/build/download-1d8f00bb/libsqlite3.dylib",
+        "file": "/Users/abner/Projects/DWorkspace/packages/d_rocket_engine_postgres/.dart_tool/hooks_runner/shared/sqlite3/build/download-84177f5/libsqlite3.dylib",
         "id": "package:sqlite3/src/ffi/libsqlite3.g.dart",
         "link_mode": {
           "type": "dynamic_loading_bundle"
@@ -13,5 +13,5 @@
   ],
   "assets_for_linking": {},
   "status": "success",
-  "timestamp": "2026-06-17 17:05:36.000"
+  "timestamp": "2026-06-17 18:57:38.000"
 }
