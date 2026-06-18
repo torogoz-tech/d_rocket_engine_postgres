@@ -89,19 +89,35 @@ class PgDb {
     String? password,
     List<EntityMeta> entityMetas = const <EntityMeta>[],
     bool autoMigrate = false,
+    //: [engine] (a [DbEngine]) is the
+    // explicit way to choose the engine.
+    // When provided, the [EngineRegistry]
+    // is bypassed entirely — you don't
+    // need to call dRocketPostgres() first.
+    // When null, the engine is looked up
+    // from the registry (the legacy path,
+    // still supported). For tests and
+    // multi-engine apps, prefer the
+    // explicit path.
+    DbEngine? engine,
   }) async {
-    final DbEngine engine = EngineRegistry.findOrThrow;
-    if (engine.name != 'postgres') {
+    //: prefer the explicit engine (the
+    // new path) over the registry (the
+    // legacy path). When the user passes
+    // `engine: const PostgresEngine()`,
+    // the registry is bypassed entirely.
+    final DbEngine resolved = engine ?? EngineRegistry.findOrThrow;
+    if (resolved.name != 'postgres') {
       throw DatabaseException(
         'PgDb is the Postgres engine facade; the registered '
-        'engine is "${engine.name}". Use the engine-specific '
+        'engine is "${resolved.name}". Use the engine-specific '
         'facade (Db for d_rocket_engine_sqlite) for a '
         'different backend, or register the Postgres engine '
         'with dRocketPostgres() before calling PgDb.open.',
-        cause: engine.name,
+        cause: resolved.name,
       );
     }
-    final AsyncQueryProvider raw = await engine.open(
+    final AsyncQueryProvider raw = await resolved.open(
       path: url,
       password: password,
     );
