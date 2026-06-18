@@ -26,8 +26,8 @@
 /// import 'package:d_rocket_engine_postgres/d_rocket_engine_postgres.dart';
 ///
 /// Future<void> main() async {
-///   dRocketPostgres();
-///   initializeD();
+///   dRocketPostgres();  // 1. infra: registrar el engine (una vez)
+///   initializeD();      // 2. app: registrar las entidades del codegen
 ///
 ///   final db = await PgDb.open(
 ///     url: 'postgres://app:secret@localhost:5432/mydb',
