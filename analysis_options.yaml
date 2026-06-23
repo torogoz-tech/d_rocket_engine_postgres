@@ -1,0 +1,13 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+  exclude:
+    - test/integration/listen_notify_pg_test.dart
+
+linter:
+  rules:
+    - prefer_const_constructors
+    - prefer_final_locals

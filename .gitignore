@@ -1,0 +1,11 @@
+.dart_tool/
+.packages
+.pub/
+build/
+pubspec.lock
+pubspec_overrides.yaml
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

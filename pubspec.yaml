@@ -1,15 +1,10 @@
 name: d_rocket_engine_postgres
-description: >
-  PostgreSQL engine for d_rocket 2.0. Implements the
-  d_rocket DbEngine contract over the Postgres wire
-  protocol (via package:postgres). Ships the
-  PostgresQueryProvider (AsyncQueryProvider), the
-  PgDb facade, the SQL LINQ Queryable<T> with
-  Postgres-dialect SQL translation, and a
-  dRocketPostgres() registration helper. Use
-  d_rocket_engine_postgres when you need a
-  multi-user / multi-machine backend; for local
-  single-user apps, prefer d_rocket_engine_sqlite.
+description: >-
+  PostgreSQL engine for d_rocket 2.0: implements the
+  DbEngine contract over the Postgres v3 wire protocol
+  (via package:postgres). Use it for multi-user /
+  multi-machine backends; for local single-user apps,
+  prefer d_rocket_engine_sqlite.
 version: 2.0.0
 
 repository: https://github.com/torogoz-tech/d_rocket
@@ -21,9 +16,8 @@ topics:
   - postgres
   - postgresql
   - orm
-  - engine
   - d_rocket
-  - engine-agnostic
+  - database
 
 environment:
   sdk: ^3.6.0
@@ -59,7 +53,11 @@ platforms:
   ios:
   linux:
   macos:
-  web:
   windows:
+  # No `web:` — `package:postgres` uses
+  # dart:io sockets and does not compile
+  # to JS. A web-friendly Postgres engine
+  # (PGlite WASM) would ship as a separate
+  # `d_rocket_engine_postgres_web` package.
 
 flutter:

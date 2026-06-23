@@ -52,26 +52,42 @@
 /// * `PgDb` facade + `_PostgresContext` (the
 ///   `DbContext` for migrations and change
 ///   tracking).
+/// * `PostgresDialect` (the engine-specific
+///   `SqlDialect` override: `STRPOS` for
+///   `String.contains`, `jsonb_build_object`
+///   for map literals; the `?` → `$N`
+///   placeholder rewriting happens in
+///   `PostgresQueryProvider`).
+/// * `PostgresDbSetExtension` + `DbSetLinqExtension`
+///   (the `db.set<T>().where(...).toListAsync_()`
+///   flow). The engine is async-only; the legacy
+///   sync methods (`toList_`, `count_`, …) throw
+///   a clear error directing the user to the
+///   `*Async_` variants.
 /// * `dRocketPostgres()` registration helper.
 /// * Auto-migrator integration (via the
 ///   `d_rocket` core's `auto_migration.dart`).
+/// * Connection pooling (via `src/pg/pool.dart`).
 ///
 /// ## What is NOT in 2.0.0 (deferred to 2.1)
 ///
-/// * The SQL LINQ `Queryable<T>` (the
-///   `db.set<T>().where(...)` extension). The
-///   Postgres dialect shares 90% of the SQLite
-///   translator's logic, but the remaining 10%
-///   (placeholder conversion, RETURNING clause,
-///   SERIAL/BIGSERIAL handling) is a 2.1
-///   feature. For 2.0, use the `provider`'s
-///   `selectAsync` / `executeAsync` directly.
-/// * Connection pooling (use
-///   `package:postgres_pool` directly in 2.0;
-///   `d_rocket_engine_postgres` will provide a
-///   pooled facade in 2.1).
+/// * `groupBy` / `join` / `groupJoin` LINQ
+///   operators (their return types are
+///   SQLite-flavoured; the Postgres engine
+///   would need its own
+///   `PostgresGroupedQueryable` /
+///   `PostgresJoinedQueryable`). For 2.0.0
+///   the user can do joins via raw SQL on
+///   `db.provider.selectAsync`.
 /// * LISTEN/NOTIFY-based reactive queries
 ///   (a 2.2 feature).
+///
+/// ## Phase 8.9 (2.0.0): LISTEN/NOTIFY
+///
+/// The LISTEN/NOTIFY feature is INCLUDED
+/// in 2.0.0 (not deferred to 2.2 anymore).
+/// See `PostgresListenNotify` + the
+/// `installNotifyTriggersSql` helper.
 library;
 
 import 'package:d_rocket/d_rocket.dart';
@@ -104,6 +120,9 @@ export 'src/pg/query_provider.dart';
 export 'src/pgdb.dart';
 export 'src/pgdb_set_extension.dart';
 export 'src/postgres_engine.dart';
+// 2.0.0 — LISTEN/NOTIFY reactive streams
+// (Phase 8.9).
+export 'src/listen_notify.dart';
 
 /// Top-level registration helper. Call once
 /// at app startup before any `PgDb.open` /

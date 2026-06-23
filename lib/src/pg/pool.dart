@@ -161,6 +161,30 @@ class PostgresPool implements AsyncQueryProvider {
     );
   }
 
+  /// Acquires a dedicated listener connection
+  /// for LISTEN/NOTIFY reactive streams.
+  ///
+  /// The returned connection is NOT
+  /// tracked in [_total] / [_idle] — it is
+  /// permanently held by the caller until
+  /// they call
+  /// [PostgresQueryProvider.disposeAsync].
+  /// Mixing regular queries and LISTEN on
+  /// the same connection breaks Postgres
+  /// notification delivery, hence the
+  /// separate bookkeeping.
+  ///
+  /// 2.0.0 — added for the LISTEN/NOTIFY
+  /// reactive-streams feature (Phase 8.9).
+  Future<PostgresQueryProvider> acquireListener() async {
+    if (_disposed) {
+      throw StateError(
+        'PostgresPool: acquireListener called after dispose',
+      );
+    }
+    return await _openOne();
+  }
+
   /// Acquires a connection. Returns one of:
   ///   - an idle connection (if any)
   ///   - a newly-opened one (if under [max])
