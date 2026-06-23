@@ -16,7 +16,7 @@ topics:
   - postgres
   - postgresql
   - orm
-  - d_rocket
+  - d-rocket
   - database
 
 environment:
