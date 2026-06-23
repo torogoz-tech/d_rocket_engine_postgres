@@ -43,7 +43,7 @@ replication, and large datasets.
 | `INSERT ... RETURNING` codegen support | ✅ (raw SQL only) | Full LINQ |
 | SQL LINQ `Queryable<T>` (`db.set<T>().where(...)`) | ❌ (deferred) | ✅ |
 | Connection pooling | ❌ (use `postgres_pool` directly) | Built-in pool |
-| `LISTEN` / `NOTIFY`-based reactive queries | ❌ | ✅ |
+| `LISTEN` / `NOTIFY`-based reactive queries | ✅ (raw, no async libpq) | ✅ |
 | FFI bindings to libpq | ❌ (wire protocol only) | Maybe |
 
 ## What you can do in 2.0.0

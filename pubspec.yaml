@@ -7,10 +7,10 @@ description: >-
   prefer d_rocket_engine_sqlite.
 version: 2.0.0
 
-repository: https://github.com/torogoz-tech/d_rocket
-homepage: https://github.com/torogoz-tech/d_rocket
-issue_tracker: https://github.com/torogoz-tech/d_rocket/issues
-documentation: https://github.com/torogoz-tech/d_rocket#readme
+repository: https://github.com/torogoz-tech/d_rocket_engine_postgres
+homepage: https://github.com/torogoz-tech/d_rocket_engine_postgres
+issue_tracker: https://github.com/torogoz-tech/d_rocket_engine_postgres/issues
+documentation: https://github.com/torogoz-tech/d_rocket_engine_postgres/blob/main/README.md
 
 topics:
   - postgres

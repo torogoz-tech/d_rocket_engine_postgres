@@ -79,8 +79,13 @@ in the d_rocket 2.0 multi-engine architecture.
 * **Built-in connection pooling** — use
   `package:postgres_pool` directly in 2.0.
 * **`LISTEN` / `NOTIFY` reactive queries** —
-  pure SQL polling in 2.0; native async
-  LISTEN via libpq FFI is a 2.2 feature.
+  shipped in 2.0.0 (via `PostgresListenNotify`,
+  the pure-Dart wire-protocol client). Native
+  async LISTEN via libpq FFI is a 2.2 feature
+  (the 2.0 implementation polls the socket for
+  notifications, which is fine for typical
+  workloads but blocks the connection under
+  burst traffic).
 * **libpq FFI variant** — for cases that
   need libpq's extra features (COPY,
   async LISTEN).
