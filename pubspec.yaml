@@ -5,7 +5,7 @@ description: >-
   (via package:postgres). Use it for multi-user /
   multi-machine backends; for local single-user apps,
   prefer d_rocket_engine_sqlite.
-version: 2.0.0
+version: 2.1.0
 
 repository: https://github.com/torogoz-tech/d_rocket_engine_postgres
 homepage: https://github.com/torogoz-tech/d_rocket_engine_postgres
@@ -26,7 +26,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  d_rocket: ^2.0.0
+  d_rocket: ^2.1.0
   meta: ^1.17.0
   # The Postgres wire-protocol client. We use the
   # `postgres` package (by stablekernel) for the

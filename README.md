@@ -113,8 +113,8 @@ need libpq's extra features.
 
 ```yaml
 dependencies:
-  d_rocket: ^2.0.0
-  d_rocket_engine_postgres: ^2.0.0
+  d_rocket: ^2.1.0
+  d_rocket_engine_postgres: ^2.1.0
 ```
 
 ### main.dart
