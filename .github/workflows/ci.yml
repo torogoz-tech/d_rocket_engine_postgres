@@ -32,10 +32,21 @@ jobs:
       TEST_PG_URL: postgres://d_rocket_ci:d_rocket_ci@localhost:5432/d_rocket_ci
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: torogoz-tech/d_rocket
+          ref: main
+          path: .ci/deps/d_rocket
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
+      - name: Configure local package overrides
+        run: |
+          printf '%s\n' \
+            'dependency_overrides:' \
+            '  d_rocket:' \
+            '    path: .ci/deps/d_rocket' > pubspec_overrides.yaml
       - run: flutter pub get
       - run: dart analyze
       - run: dart test --reporter=expanded
@@ -46,6 +57,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: torogoz-tech/d_rocket
+          ref: main
+          path: .ci/deps/d_rocket
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -53,5 +69,11 @@ jobs:
       - name: Verify tag and package version
         run: |
           test "$(sed -n 's/^version: *//p' pubspec.yaml | head -1)" = "${GITHUB_REF#refs/tags/v}"
+      - name: Configure local package overrides
+        run: |
+          printf '%s\n' \
+            'dependency_overrides:' \
+            '  d_rocket:' \
+            '    path: .ci/deps/d_rocket' > pubspec_overrides.yaml
       - run: flutter pub get
       - run: dart pub publish --dry-run
