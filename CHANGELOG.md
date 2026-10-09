@@ -6,6 +6,17 @@ are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — Unreleased
+
+### Compatibility
+
+* Aligned the package with the d_rocket 2.1.0 lockstep release.
+* Preserved the Postgres engine's raw SQL and asynchronous query contracts.
+* Kept SQL LINQ explicitly SQLite-only for this release; Postgres LINQ
+  pushdown remains future work rather than being advertised as supported.
+* Retained skip-gated integration tests through `TEST_PG_URL` for environments
+  that do not provide a live PostgreSQL server.
+
 ## [2.0.0] — 2026-06-17
 
 Initial release. The second engine package
@@ -68,14 +79,11 @@ in the d_rocket 2.0 multi-engine architecture.
   env var; tests are skipped (not failed) in
   environments without a Postgres instance.
 
-## Deferred to 2.1 (and beyond)
+## Deferred after 2.1 (and beyond)
 
 * **SQL LINQ `Queryable<T>`** — the
-  `db.set<T>().where(...)` extension. 90% of
-  the SQLite translator's logic is
-  reusable; the remaining 10% (placeholder
-  conversion, RETURNING clause, SERIAL /
-  BIGSERIAL handling) is a 2.1 feature.
+  `db.set<T>().where(...)` extension remains
+  outside the 2.1.0 SQLite-only LINQ scope.
 * **Built-in connection pooling** — use
   `package:postgres_pool` directly in 2.0.
 * **`LISTEN` / `NOTIFY` reactive queries** —
